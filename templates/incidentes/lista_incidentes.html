@@ -1,0 +1,60 @@
+{% extends 'incidentes/base.html' %}
+
+{% block title %}Lista de Incidentes - SGI UTO{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4>Lista de Incidentes</h4>
+    <a href="{% url 'crear_incidente' %}" class="btn btn-primary btn-sm">+ Nuevo Incidente</a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        {% if incidentes %}
+        <table class="table table-hover mb-0">
+            <thead style="background-color: #1B3A6B; color: white;">
+                <tr>
+                    <th class="p-3">#</th>
+                    <th class="p-3">Título</th>
+                    <th class="p-3">Categoría</th>
+                    <th class="p-3">Prioridad</th>
+                    <th class="p-3">Estado</th>
+                    <th class="p-3">Reportado por</th>
+                    <th class="p-3">Fecha</th>
+                    <th class="p-3">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for incidente in incidentes %}
+                <tr {% if incidente.vencido %}style="background-color: #fde8e8;"{% endif %}>
+                    <td class="p-3">{{ incidente.id }}</td>
+                    <td class="p-3">{{ incidente.titulo }}</td>
+                    <td class="p-3">{{ incidente.categoria }}</td>
+                    <td class="p-3">
+                        <span class="badge badge-{{ incidente.prioridad }}">
+                            {{ incidente.get_prioridad_display }}
+                        </span>
+                    </td>
+                    <td class="p-3">
+                        <span class="badge badge-{{ incidente.estado }}">
+                            {{ incidente.get_estado_display }}
+                        </span>
+                    </td>
+                    <td class="p-3">{{ incidente.reportado_por.username }}</td>
+                    <td class="p-3">{{ incidente.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                    <td class="p-3">
+                        <a href="{% url 'detalle_incidente' incidente.pk %}" class="btn btn-outline-primary btn-sm">Ver</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-center p-5 text-muted">
+            <h5>No hay incidentes registrados</h5>
+            <a href="{% url 'crear_incidente' %}" class="btn btn-primary mt-2">Crear el primero</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

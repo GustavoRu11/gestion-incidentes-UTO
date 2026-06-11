@@ -1,0 +1,122 @@
+{% extends 'incidentes/base.html' %}
+
+{% block title %}Dashboard - SGI UTO{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<h4 class="mb-4">Panel Principal</h4>
+
+<!-- Tarjetas de conteo -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card p-3" style="border-left: 5px solid #2E6DA4;">
+            <div class="text-muted small">Abiertos</div>
+            <div style="font-size:48px; font-weight:bold; color:#1B3A6B;">{{ total_abiertos }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3" style="border-left: 5px solid #f0ad4e;">
+            <div class="text-muted small">En Proceso</div>
+            <div style="font-size:48px; font-weight:bold; color:#1B3A6B;">{{ total_en_proceso }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3" style="border-left: 5px solid #d9534f;">
+            <div class="text-muted small">Escalados</div>
+            <div style="font-size:48px; font-weight:bold; color:#1B3A6B;">{{ total_escalados }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3" style="border-left: 5px solid #5cb85c;">
+            <div class="text-muted small">Cerrados</div>
+            <div style="font-size:48px; font-weight:bold; color:#1B3A6B;">{{ total_cerrados }}</div>
+        </div>
+    </div>
+</div>
+
+{% if total_vencidos > 0 %}
+<div class="alert alert-danger">
+    ⚠️ Hay <strong>{{ total_vencidos }}</strong> incidente(s) que han superado su tiempo de resolución (SLA).
+</div>
+{% endif %}
+
+<!-- Gráficas -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6 class="mb-3">Incidentes por Categoría</h6>
+            <canvas id="graficaCategorias"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6 class="mb-3">Incidentes por Estado</h6>
+            <canvas id="graficaEstados"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Últimos incidentes -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h6 class="mb-3">Últimos Incidentes</h6>
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Título</th>
+                    <th>Estado</th>
+                    <th>Prioridad</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for incidente in ultimos_incidentes %}
+                <tr>
+                    <td>{{ incidente.id }}</td>
+                    <td><a href="{% url 'detalle_incidente' incidente.pk %}">{{ incidente.titulo }}</a></td>
+                    <td>{{ incidente.get_estado_display }}</td>
+                    <td>{{ incidente.get_prioridad_display }}</td>
+                    <td>{{ incidente.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const ctxCat = document.getElementById('graficaCategorias').getContext('2d');
+    new Chart(ctxCat, {
+        type: 'bar',
+        data: {
+            labels: [{% for item in categorias_data %}"{{ item.nombre }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Incidentes',
+                data: [{% for item in categorias_data %}{{ item.total }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                backgroundColor: '#2E6DA4',
+                borderRadius: 6,
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+
+    const ctxEst = document.getElementById('graficaEstados').getContext('2d');
+    new Chart(ctxEst, {
+        type: 'doughnut',
+        data: {
+            labels: ['Abiertos', 'En Proceso', 'Escalados', 'Cerrados'],
+            datasets: [{
+                data: [{{ total_abiertos }}, {{ total_en_proceso }}, {{ total_escalados }}, {{ total_cerrados }}],
+                backgroundColor: ['#2E6DA4', '#f0ad4e', '#d9534f', '#5cb85c'],
+            }]
+        },
+        options: { responsive: true }
+    });
+</script>
+{% endblock %}

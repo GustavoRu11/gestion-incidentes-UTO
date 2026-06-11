@@ -1,0 +1,90 @@
+{% extends 'incidentes/base.html' %}
+
+{% block title %}Detalle Incidente - SGI UTO{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'lista_incidentes' %}" class="btn btn-outline-secondary btn-sm">← Volver a la lista</a>
+</div>
+
+<div class="row g-4">
+    <!-- Detalle del incidente -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header p-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Incidente #{{ incidente.id }}</h5>
+                <span class="badge badge-{{ incidente.prioridad }}">
+                    {{ incidente.get_prioridad_display }}
+                </span>
+            </div>
+            <div class="card-body p-4">
+                <h5>{{ incidente.titulo }}</h5>
+                <p class="text-muted">{{ incidente.descripcion }}</p>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Categoría:</strong> {{ incidente.categoria }}</p>
+                        <p><strong>Estado:</strong> {{ incidente.get_estado_display }}</p>
+                        <p><strong>Prioridad:</strong> {{ incidente.get_prioridad_display }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Reportado por:</strong> {{ incidente.reportado_por.username }}</p>
+                        <p><strong>Asignado a:</strong> {{ incidente.asignado_a|default:"Sin asignar" }}</p>
+                        <p><strong>Fecha:</strong> {{ incidente.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bitácora -->
+        <div class="card mt-4">
+            <div class="card-header p-3">
+                <h6 class="mb-0">Historial de cambios</h6>
+            </div>
+            <div class="card-body p-4">
+                {% if bitacora %}
+                    {% for registro in bitacora %}
+                    <div style="border-left: 3px solid #2E6DA4; padding-left: 16px; margin-bottom: 16px;">
+                        <small class="text-muted">{{ registro.fecha|date:"d/m/Y H:i" }} — {{ registro.usuario.username }}</small>
+                        <p class="mb-0">Cambió <strong>{{ registro.campo_modificado }}</strong>
+                        {% if registro.valor_anterior %}
+                            de <em>{{ registro.valor_anterior }}</em>
+                        {% endif %}
+                        a <em>{{ registro.valor_nuevo }}</em></p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">Sin cambios registrados.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de gestión -->
+    {% if rol == 'administrador' or rol == 'jefe_dti' or rol == 'tecnico' %}
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header p-3">
+                <h6 class="mb-0">Gestionar Incidente</h6>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ form.estado.label }}</label>
+                        {{ form.estado }}
+                    </div>
+                    {% if rol == 'administrador' or rol == 'jefe_dti' %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ form.asignado_a.label }}</label>
+                        {{ form.asignado_a }}
+                    </div>
+                    {% endif %}
+                    <button type="submit" class="btn btn-primary w-100">Guardar cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
