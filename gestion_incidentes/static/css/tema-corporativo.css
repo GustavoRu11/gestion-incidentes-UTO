@@ -1,0 +1,74 @@
+:root {
+    --color-primary: #1B3A6B;
+    --color-secondary: #2E6DA4;
+    --color-accent: #D6E4F0;
+    --color-dark: #0d2240;
+    --color-light: #f4f6f9;
+    --color-gold: #2E6DA4;
+}
+
+body {
+    background-color: #f4f6f9;
+    font-family: 'Roboto', sans-serif;
+    background-image: none;
+}
+
+.navbar {
+    background: linear-gradient(135deg, #0d2240 0%, #1B3A6B 100%) !important;
+    border-bottom: 3px solid #2E6DA4 !important;
+}
+
+.navbar-brand {
+    color: #ffffff !important;
+    font-family: 'Oswald', sans-serif;
+    letter-spacing: 2px;
+}
+
+.navbar-brand span {
+    color: #D6E4F0 !important;
+}
+
+.stat-card.abierto { background: linear-gradient(135deg, #1B3A6B, #2E6DA4) !important; border-left: 4px solid #D6E4F0 !important; }
+.stat-card.proceso { background: linear-gradient(135deg, #b8860b, #DAA520) !important; }
+.stat-card.escalado { background: linear-gradient(135deg, #8B0000, #cc2200) !important; }
+.stat-card.cerrado { background: linear-gradient(135deg, #1a5c2a, #2d8a45) !important; }
+
+.card-header {
+    background: linear-gradient(135deg, #0d2240, #1B3A6B) !important;
+    border-bottom: 2px solid #2E6DA4 !important;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #1B3A6B, #0d2240) !important;
+    border: none !important;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0d2240, #1B3A6B) !important;
+}
+
+.btn-outline-primary {
+    color: #1B3A6B !important;
+    border-color: #1B3A6B !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: #1B3A6B !important;
+    color: white !important;
+}
+
+.table thead th {
+    background: linear-gradient(135deg, #0d2240, #1B3A6B) !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #D6E4F0 !important;
+}
+
+.timeline-item {
+    border-left: 3px solid #2E6DA4 !important;
+}
+
+.mundial-footer {
+    color: #1B3A6B !important;
+}

@@ -1,0 +1,43 @@
+{% extends 'incidentes/base.html' %}
+
+{% block title %}Notificaciones - SGI UTO{% endblock %}
+
+{% block content %}
+<h4 class="mb-4">🔔 Notificaciones</h4>
+
+<div class="card">
+    <div class="card-header p-3">
+        <h6 class="mb-0">Tus notificaciones</h6>
+    </div>
+    <div class="card-body p-0">
+        {% if notificaciones %}
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th class="p-3">Mensaje</th>
+                    <th class="p-3">Incidente</th>
+                    <th class="p-3">Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for notif in notificaciones %}
+                <tr {% if not notif.leida %}style="font-weight:500;"{% endif %}>
+                    <td class="p-3">{{ notif.mensaje }}</td>
+                    <td class="p-3">
+                        {% if notif.incidente %}
+                        <a href="{% url 'detalle_incidente' notif.incidente.pk %}">Ver incidente #{{ notif.incidente.id }}</a>
+                        {% endif %}
+                    </td>
+                    <td class="p-3">{{ notif.fecha|date:"d/m/Y H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-center p-5 text-muted">
+            <h5>🔔 No tienes notificaciones</h5>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

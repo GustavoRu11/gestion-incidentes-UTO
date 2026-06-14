@@ -82,3 +82,14 @@ class Bitacora(models.Model):
 
     def __str__(self):
         return f'{self.incidente} - {self.campo_modificado} - {self.fecha}'
+    
+    # Modelo de notificaciones internas
+class Notificacion(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificaciones')
+    mensaje = models.TextField()
+    leida = models.BooleanField(default=False)
+    fecha = models.DateTimeField(auto_now_add=True)
+    incidente = models.ForeignKey(Incidente, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.usuario.username} - {self.mensaje[:50]}'

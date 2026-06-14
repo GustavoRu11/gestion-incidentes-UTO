@@ -10,4 +10,5 @@ urlpatterns = [
     path('incidentes/<int:pk>/', views.detalle_incidente, name='detalle_incidente'),
     path('reportes/', views.reportes, name='reportes'),
     path('bitacora/', views.bitacora, name='bitacora'),
+    path('notificaciones/', views.notificaciones, name='notificaciones'),
 ]

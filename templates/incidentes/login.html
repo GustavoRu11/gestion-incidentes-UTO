@@ -3,70 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión - Sistema de Gestión de Incidentes UTO</title>
+    <title>Iniciar Sesión - SGI UTO</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: #1B3A6B;
-            height: 100vh;
+            background: linear-gradient(135deg, #0d3d1a 0%, #1a5c2a 50%, #0d3d1a 100%);
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-family: 'Roboto', sans-serif;
+            background-image: 
+                linear-gradient(135deg, #0d3d1a 0%, #1a5c2a 50%, #0d3d1a 100%),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 40px,
+                    rgba(255,255,255,0.03) 40px,
+                    rgba(255,255,255,0.03) 80px
+                );
         }
-        .card {
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-        }
-        .card-header {
-            background-color: #1B3A6B;
-            color: white;
-            text-align: center;
-            border-radius: 12px 12px 0 0 !important;
-            padding: 24px;
-        }
-        .btn-primary {
-            background-color: #2E6DA4;
-            border-color: #2E6DA4;
+
+        .login-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
             width: 100%;
+            max-width: 420px;
         }
-        .btn-primary:hover {
-            background-color: #1B3A6B;
-            border-color: #1B3A6B;
+
+        .login-header {
+            background: linear-gradient(135deg, #0d3d1a, #1a5c2a);
+            border-bottom: 3px solid #FFD700;
+            padding: 32px 24px;
+            text-align: center;
+        }
+
+        .login-header .ball {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .login-header h4 {
+            font-family: 'Oswald', sans-serif;
+            color: #FFD700;
+            font-size: 22px;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        .login-header p {
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+            margin: 6px 0 0 0;
+        }
+
+        .login-body {
+            padding: 32px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #1a5c2a;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: #1a5c2a;
+            box-shadow: 0 0 0 3px rgba(26,92,42,0.1);
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #1a5c2a, #0d3d1a);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 16px;
+            letter-spacing: 2px;
+            width: 100%;
+            transition: opacity 0.2s;
+        }
+
+        .btn-login:hover {
+            opacity: 0.9;
+            color: #FFD700;
+        }
+
+        .login-footer {
+            text-align: center;
+            padding: 12px;
+            background: #f8f9fa;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="mb-1">Sistema de Gestión de Incidentes</h4>
-                        <small>Universidad Tecnológica del Occidente</small>
-                    </div>
-                    <div class="card-body p-4">
-                        {% if messages %}
-                            {% for message in messages %}
-                                <div class="alert alert-danger">{{ message }}</div>
-                            {% endfor %}
-                        {% endif %}
-                        <form method="POST">
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                <label class="form-label">Usuario</label>
-                                <input type="text" name="username" class="form-control" required autofocus>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Contraseña</label>
-                                <input type="password" name="password" class="form-control" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
-                        </form>
-                    </div>
+    <div class="login-card">
+        <div class="login-header">
+            <span class="ball">⚽</span>
+            <h4>SGI - UTO</h4>
+            <p>Sistema de Gestión de Incidentes<br>Universidad Tecnológica del Occidente</p>
+        </div>
+        <div class="login-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger py-2 mb-3" style="font-size:13px;">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Usuario</label>
+                    <input type="text" name="username" class="form-control" required autofocus>
                 </div>
-            </div>
+                <div class="mb-4">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn-login">INICIAR SESIÓN</button>
+            </form>
+        </div>
+        <div class="login-footer">
+            ⚽ SGI-UTO 2026 · Todos los derechos reservados
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

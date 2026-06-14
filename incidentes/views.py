@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Perfil, Incidente, Categoria, Bitacora
+from django.contrib.auth.models import User
+from .models import Perfil, Incidente, Categoria, Bitacora, Notificacion
 from .forms import IncidenteForm, AsignarTecnicoForm
 
 # Función para obtener el rol del usuario
@@ -11,6 +12,10 @@ def get_rol(user):
         return Perfil.objects.get(usuario=user).rol
     except Perfil.DoesNotExist:
         return 'administrador'
+
+# Función para obtener notificaciones no leídas
+def get_notificaciones_count(user):
+    return Notificacion.objects.filter(usuario=user, leida=False).count()
 
 # Vista de login
 def login_view(request):
@@ -43,7 +48,6 @@ def dashboard(request):
     total_cerrados = Incidente.objects.filter(estado='cerrado').count()
     ultimos_incidentes = Incidente.objects.all().order_by('-fecha_creacion')[:5]
 
-    # Datos para gráfica de categorías
     categorias = Categoria.objects.all()
     categorias_data = []
     for cat in categorias:
@@ -52,7 +56,6 @@ def dashboard(request):
             'total': Incidente.objects.filter(categoria=cat).count()
         })
 
-    # Calcular incidentes vencidos por SLA
     sla_horas = {'critica': 4, 'alta': 8, 'media': 24, 'baja': 72}
     ahora = timezone.now()
     total_vencidos = 0
@@ -70,6 +73,7 @@ def dashboard(request):
         'ultimos_incidentes': ultimos_incidentes,
         'categorias_data': categorias_data,
         'total_vencidos': total_vencidos,
+        'notificaciones_count': get_notificaciones_count(request.user),
     }
     return render(request, 'incidentes/dashboard.html', context)
 
@@ -90,11 +94,19 @@ def crear_incidente(request):
                 valor_anterior='',
                 valor_nuevo='abierto'
             )
+            # Notificar a administradores y jefe_dti
+            admins = User.objects.filter(perfil__rol__in=['administrador', 'jefe_dti'])
+            for admin in admins:
+                Notificacion.objects.create(
+                    usuario=admin,
+                    mensaje=f'Nuevo incidente creado: "{incidente.titulo}" por {request.user.username}',
+                    incidente=incidente
+                )
             messages.success(request, 'Incidente creado exitosamente.')
             return redirect('lista_incidentes')
     else:
         form = IncidenteForm()
-    return render(request, 'incidentes/crear_incidente.html', {'form': form, 'rol': rol})
+    return render(request, 'incidentes/crear_incidente.html', {'form': form, 'rol': rol, 'notificaciones_count': get_notificaciones_count(request.user)})
 
 # Vista para listar incidentes
 @login_required(login_url='login')
@@ -110,7 +122,6 @@ def lista_incidentes(request):
     else:
         incidentes = Incidente.objects.all().order_by('-fecha_creacion')
 
-    # Marcar incidentes vencidos por SLA
     sla_horas = {'critica': 4, 'alta': 8, 'media': 24, 'baja': 72}
     ahora = timezone.now()
     for incidente in incidentes:
@@ -120,7 +131,11 @@ def lista_incidentes(request):
         else:
             incidente.vencido = False
 
-    return render(request, 'incidentes/lista_incidentes.html', {'incidentes': incidentes, 'rol': rol})
+    return render(request, 'incidentes/lista_incidentes.html', {
+        'incidentes': incidentes,
+        'rol': rol,
+        'notificaciones_count': get_notificaciones_count(request.user)
+    })
 
 # Vista para ver detalle y gestionar incidente
 @login_required(login_url='login')
@@ -144,13 +159,23 @@ def detalle_incidente(request, pk):
                         valor_anterior=estado_anterior,
                         valor_nuevo=incidente_actualizado.estado
                     )
-                if asignado_anterior != str(incidente_actualizado.asignado_a):
+                    Notificacion.objects.create(
+                        usuario=incidente_actualizado.reportado_por,
+                        mensaje=f'Tu incidente "{incidente_actualizado.titulo}" cambió de estado a {incidente_actualizado.get_estado_display()}',
+                        incidente=incidente_actualizado
+                    )
+                if incidente_actualizado.asignado_a and asignado_anterior != str(incidente_actualizado.asignado_a):
                     Bitacora.objects.create(
                         incidente=incidente_actualizado,
                         usuario=request.user,
                         campo_modificado='asignado_a',
                         valor_anterior=asignado_anterior,
                         valor_nuevo=str(incidente_actualizado.asignado_a)
+                    )
+                    Notificacion.objects.create(
+                        usuario=incidente_actualizado.asignado_a,
+                        mensaje=f'Se te asignó el incidente "{incidente_actualizado.titulo}"',
+                        incidente=incidente_actualizado
                     )
                 messages.success(request, 'Incidente actualizado correctamente.')
                 return redirect('detalle_incidente', pk=pk)
@@ -159,20 +184,18 @@ def detalle_incidente(request, pk):
         'bitacora': bitacora,
         'form': form,
         'rol': rol,
+        'notificaciones_count': get_notificaciones_count(request.user),
     }
     return render(request, 'incidentes/detalle_incidente.html', context)
 
 # Vista de reportes
 @login_required(login_url='login')
 def reportes(request):
-    from django.utils import timezone
     rol = get_rol(request.user)
     if rol not in ['administrador', 'jefe_dti']:
         return redirect('dashboard')
 
     incidentes = Incidente.objects.all().order_by('-fecha_creacion')
-
-    # Filtros
     fecha_inicio = request.GET.get('fecha_inicio')
     fecha_fin = request.GET.get('fecha_fin')
     estado = request.GET.get('estado')
@@ -193,6 +216,7 @@ def reportes(request):
         'incidentes': incidentes,
         'categorias': categorias,
         'total': incidentes.count(),
+        'notificaciones_count': get_notificaciones_count(request.user),
     }
     return render(request, 'incidentes/reportes.html', context)
 
@@ -207,5 +231,18 @@ def bitacora(request):
     context = {
         'rol': rol,
         'registros': registros,
+        'notificaciones_count': get_notificaciones_count(request.user),
     }
     return render(request, 'incidentes/bitacora.html', context)
+
+# Vista de notificaciones
+@login_required(login_url='login')
+def notificaciones(request):
+    rol = get_rol(request.user)
+    notifs = Notificacion.objects.filter(usuario=request.user).order_by('-fecha')
+    notifs.update(leida=True)
+    return render(request, 'incidentes/notificaciones.html', {
+        'notificaciones': notifs,
+        'rol': rol,
+        'notificaciones_count': 0,
+    })
