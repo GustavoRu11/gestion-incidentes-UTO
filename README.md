@@ -1,53 +1,45 @@
 # Sistema Web de Gestión de Incidentes Tecnológicos - UTO
 
-Sistema desarrollado como proyecto académico para la Universidad Tecnológica del Occidente (UTO), bajo el enfoque del Project Management Institute (PMI/PMBOK).
+Sistema desarrollado como proyecto académico para la **Universidad Tecnológica del Occidente (UTO)**, bajo el enfoque del **Project Management Institute (PMI / PMBOK)**.
 
-## Descripción
-Plataforma web que permite al Departamento de Tecnología de la Información (DTI) gestionar incidentes tecnológicos de forma centralizada, con trazabilidad, control de SLA y reportes estadísticos.
+---
 
-## Tecnologías utilizadas
-- Python 3.14
-- Django 6.0.6
-- SQLite
-- Bootstrap 5
-- Chart.js
+## 📌 Descripción
 
-## Roles del sistema
-- Administrador: acceso total al sistema
-- Jefe DTI: acceso total al sistema
-- Técnico: gestiona incidentes asignados
-- Usuario Final: reporta y consulta sus incidentes
+Plataforma web que permite al Departamento de Tecnología de la Información (DTI) gestionar incidentes tecnológicos de forma centralizada, garantizando trazabilidad completa, control de Acuerdos de Nivel de Servicio (SLA) y generación de reportes estadísticos.
 
-## Requisitos previos
-- Python 3.11 o superior
-- pip
+---
 
-## Instalación
+## 🛠️ Tecnologías Utilizadas
 
-1. Clona el repositorio
-git clone https://github.com/GustavoRu11/gestion-incidentes-UTO.git
+* **Lenguaje:** Python 3.12+
+* **Framework Web:** Django 5.x / 6.x
+* **Base de Datos:** SQLite (Entorno de desarrollo)
+* **Frontend:** Bootstrap 5, HTML5, CSS3, JavaScript
+* **Visualización de Datos:** Chart.js
+
+---
+
+## 👥 Roles del Sistema
+
+* **Administrador:** Control y configuración total del sistema.
+* **Jefe DTI:** Supervisión global, métricas y asignación de prioridades.
+* **Técnico:** Gestión, atención y resolución de incidentes asignados.
+* **Usuario Final:** Apertura y seguimiento de incidentes propios.
+
+---
+
+## 📋 Requisitos Previos
+
+* **Python:** Versión 3.11 o superior instalada.
+* **Gestor de paquetes:** `pip` actualizado.
+* **Control de versiones:** Git.
+
+---
+
+## 🚀 Instalación y Despliegue Local
+
+### 1. Clonar el repositorio
+```bash
+git clone [https://github.com/GustavoRu11/gestion-incidentes-UTO.git](https://github.com/GustavoRu11/gestion-incidentes-UTO.git)
 cd gestion-incidentes-UTO
-
-2. Crea y activa el entorno virtual
-python -m venv venv
-venv\Scripts\activate
-
-3. Instala las dependencias
-pip install django
-
-4. Aplica las migraciones
-python manage.py migrate
-
-5. Crea el superusuario
-python manage.py createsuperuser
-
-6. Ejecuta el servidor
-python manage.py runserver
-
-7. Abre el navegador en http://127.0.0.1:8000
-
-## Ejecutar pruebas
-python manage.py test incidentes
-
-## Autor
-Gustavo - Universidad Mariano Gálvez de Guatemala (UMG)
